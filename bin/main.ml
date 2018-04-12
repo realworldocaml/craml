@@ -38,36 +38,16 @@ let run_test temp_file t =
   | WEXITED n -> n
   | _ -> 255
 
-let () =
-  let expect_test = ref None in
-  let usage =
-    Printf.sprintf "%s [OPTIONS]" (Filename.basename Sys.executable_name)
-  in
-  let anon s =
-    match !expect_test with
-    | None -> expect_test := Some s
-    | Some _ -> raise (Arg.Bad "test must only be given once")
-  in
-  let non_deterministic = ref false in
-  Arg.parse [
-    "--non-deterministic",
-    Arg.Set non_deterministic,
-    "Run non-deterministic tests"
-  ] anon usage;
-  let expect_test =
-    match !expect_test with
-    | None -> raise (Arg.Bad "expect test file must be passed")
-    | Some p -> p
-  in
+let run non_deterministic expect_test =
   Cram.run expect_test ~f:(fun file_contents items ->
-      let temp_file = Filename.temp_file "jbuilder-test" ".output" in
+      let temp_file = Filename.temp_file "cram" ".output" in
       at_exit (fun () -> Sys.remove temp_file);
       let buf = Buffer.create (String.length file_contents + 1024) in
       let ppf = Format.formatter_of_buffer buf in
       List.iter (function
           | Cram.Line l -> Cram.pp_line ppf l
           | Cram.Test t ->
-            match !non_deterministic, t.Cram.non_deterministic with
+            match non_deterministic, t.Cram.non_deterministic with
             | false, `Command ->
               (* the command is non-deterministic so skip everything *)
               List.iter (Cram.pp_line ppf) t.Cram.lines
@@ -92,3 +72,21 @@ let () =
         ) items;
       Format.pp_print_flush ppf ();
       Buffer.contents buf)
+
+open Cmdliner
+
+let non_deterministic =
+  let doc = "Run non-deterministic tests." in
+  Arg.(value & flag & info ["non-deterministic"; "n"] ~doc)
+
+let expect_test =
+  let doc = "The test to run." in
+  Arg.(required & pos 0 (some string) None & info [] ~doc ~docv:"FILE")
+
+let cmd =
+  let doc = "A simple tool for to run CRAM tests." in
+  let exits = Term.default_exits in
+  Term.(pure run $ non_deterministic $ expect_test),
+  Term.info "burn" ~version:"%%VERSION%%" ~doc ~exits
+
+let () = Term.(exit @@ eval cmd)

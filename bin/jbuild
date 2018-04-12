@@ -4,6 +4,6 @@
  ((name        main)
   (public_name cram)
   (modules     (main))
-  (libraries   (fmt cram unix))))
+  (libraries   (fmt cram unix cmdliner))))
 
 (executable ((name convert) (modules convert)))
