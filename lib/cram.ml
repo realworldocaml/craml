@@ -1,8 +1,6 @@
-open Sexplib.Std
+type line = S.line
 
-type line = S.line [@@deriving sexp]
-
-type nd = [`Command | `Output | `False] [@@deriving sexp]
+type nd = [`Command | `Output | `False]
 
 type test = {
   part: string option;
@@ -10,14 +8,13 @@ type test = {
   command: string;
   output: [`Output of string | `Ellipsis] list;
   lines: line list;
-} [@@deriving sexp]
+}
 
 type item =
   | Test of test
   | Line of line
-[@@deriving sexp]
 
-type t = item list [@@deriving sexp]
+type t = item list
 
 let fold l =
   let rec output ls acc k = function

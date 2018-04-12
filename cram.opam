@@ -9,6 +9,7 @@ build: [ "jbuilder" "build" ]
 
 depends: [
   "jbuilder" {build}
+  "fmt"
 ]
 
 available: [

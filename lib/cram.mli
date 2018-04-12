@@ -32,7 +32,7 @@ type item =
   | Test of test
   | Line of line
 
-type t = item list [@@deriving sexp]
+type t = item list
 (** The type for cram files. *)
 
 val pp: ?hide:bool -> t Fmt.t

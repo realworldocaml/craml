@@ -1,5 +1,3 @@
-open Sexplib.Std
-
 type line = [
   | `Output  of string
   | `Command of string
@@ -7,4 +5,4 @@ type line = [
   | `Part    of string
   | `Ellipsis
   | `Non_det of [`Command|`Output]
-] [@@deriving sexp]
+]

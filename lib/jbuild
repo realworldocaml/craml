@@ -3,7 +3,6 @@
 (library
  ((name        cram)
   (public_name cram)
-  (libraries  (fmt sexplib))
-  (preprocess (pps (ppx_jane)))))
+  (libraries  (fmt))))
 
 (ocamllex (lexer))
