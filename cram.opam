@@ -1,11 +1,15 @@
 opam-version: "1.2"
 maintainer: "Thomas Gazagnaire <thomas@gazagnaire.org>"
-homepage: "https://github.com/realworldocaml/book"
+homepage: "https://github.com/realworldocaml/ocaml-cram"
 license: "ISC"
-dev-repo: "https://github.com/realworldocaml/book.git"
-bug-reports: "https://github.com/realworldocaml/book/issues"
+dev-repo: "https://github.com/realworldocaml/ocaml-cram.git"
+bug-reports: "https://github.com/realworldocaml/ocaml-cram/issues"
 
 build: [ "jbuilder" "build" ]
+
+depends: [
+  "jbuilder" {build}
+]
 
 available: [
   ocaml-version >= "4.06.0"
