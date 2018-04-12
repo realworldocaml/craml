@@ -6,7 +6,7 @@ tool](https://bitheap.org/cram/), which was itself based on
 Mercurial's [unified test
 format](https://www.selenic.com/blog/?p=663).
 
-Ocaml-cram` is released as a single binary (called `cram`) and
+Ocaml-cram is released as a single binary (called `cram`) and
 supports the following syntax:
 
 - Lines beginning with two spaces, a dollar sign, and a space are
