@@ -3,6 +3,6 @@
 (library
  ((name        cram)
   (public_name cram)
-  (libraries  (fmt))))
+  (libraries  (fmt astring))))
 
 (ocamllex (lexer))

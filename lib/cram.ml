@@ -5,7 +5,7 @@ type nd = [`Command | `Output | `False]
 type test = {
   part: string option;
   non_deterministic: nd;
-  command: string;
+  command: string list;
   output: [`Output of string | `Ellipsis] list;
   lines: line list;
 }
@@ -15,6 +15,17 @@ type item =
   | Line of line
 
 type t = item list
+
+let dump_string ppf s = Fmt.pf ppf "%S" s
+
+let dump_line ppf = function
+  | `Output s         -> Fmt.pf ppf "`Output %S\n" s
+  | `Part s           -> Fmt.pf ppf "`Part %S\n" s
+  | `Command c        -> Fmt.pf ppf "`Command %a" Fmt.(Dump.list dump_string) c
+  | `Ellipsis         -> Fmt.pf ppf "`Ellipsis"
+  | `Non_det `Output  -> Fmt.pf ppf "`Non_det `Output"
+  | `Non_det `Command -> Fmt.pf ppf "`Not_det `Command"
+  | `Comment s        -> Fmt.pf ppf "`Comment %S" s
 
 let fold l =
   let rec output ls acc k = function
@@ -28,7 +39,8 @@ let fold l =
     | `Command s as l :: t -> create (l :: lines) `False part s k t
     | (`Non_det nd as d) :: (`Command s as l) :: t ->
       create (l :: d :: lines) (nd :> nd) part s k t
-    | (`Non_det _ | `Output _ | `Ellipsis) :: _ -> failwith "malformed input"
+    | (`Non_det _ | `Output _ | `Ellipsis as l) :: _ ->
+      Fmt.failwith "malformed input: '%a'" dump_line l
   and create ls non_deterministic part s k t =
     output ls [] (fun lines output rest ->
         let c = { lines; part; non_deterministic; command = s; output } in
@@ -57,7 +69,10 @@ let part n t =
   | [] -> None
   | l  -> Some l
 
-let is_meta s =String.length s >= 2 && String.sub s 0 2 = "@@"
+let is_meta s = String.length s >= 2 && String.sub s 0 2 = "@@"
+
+let pp_command ppf c =
+  Fmt.pf ppf "  $ %a" Fmt.(list ~sep:(unit "\\\n  > ") string) c
 
 let pp_line ?(hide=false) ppf line =
   let pp_meta ppf fmt =
@@ -68,7 +83,7 @@ let pp_line ?(hide=false) ppf line =
   match line with
   | `Output s         -> Fmt.pf ppf "  %s\n" s
   | `Part s           -> Fmt.pf ppf "### %s\n" s
-  | `Command s        -> Fmt.pf ppf "  $ %s\n" s
+  | `Command c        -> Fmt.pf ppf "  $ %a\n" pp_command c
   | `Ellipsis         -> Fmt.pf ppf "  ...\n"
   | `Non_det `Output  -> pp_meta ppf "%%%% --non-deterministic\n"
   | `Non_det `Command -> pp_meta ppf "%%%% --non-deterministic [skip]\n"
@@ -100,11 +115,13 @@ let equal_output a b =
 
 module Html = struct
 
+  let pp_command ppf c = Fmt.(list ~sep:(unit "\\\n  ") string) ppf c
+
   let pp_line ppf line =
     match line with
     | `Output s  -> Fmt.pf ppf ">%s\n" s
     | `Part _    -> assert false
-    | `Command s -> Fmt.pf ppf "%s\n" s
+    | `Command c -> Fmt.pf ppf "%a\n" pp_command c
     | `Ellipsis  -> Fmt.pf ppf "  ...\n"
     | `Non_det _
     | `Comment _ -> ()

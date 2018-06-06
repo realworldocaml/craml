@@ -7,11 +7,14 @@ type output = [`Output of string | `Ellipsis]
 (** The type for all lines. *)
 type line = [
   output
-  | `Command of string
+  | `Command of string list
   | `Comment of string
   | `Part    of string
   | `Non_det of [`Output | `Command]
 ]
+
+val pp_command: string list Fmt.t
+(** [pp_command] display a multi-line command. *)
 
 val pp_line: ?hide:bool -> line Fmt.t
 (** [pp_line] is the pretty-printer for lines. If [hide] is true,
@@ -22,7 +25,7 @@ val pp_line: ?hide:bool -> line Fmt.t
 type test = {
   part: string option;
   non_deterministic: [`Command | `Output | `False];
-  command: string;
+  command: string list;
   output: output list;
   lines: line list;
 }

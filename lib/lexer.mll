@@ -12,10 +12,13 @@
     Fmt.kstrf (fun str ->
         Fmt.failwith "%a: %s" pp_position lexbuf str
       ) fmt
+
+ let commands s = Astring.String.cuts ~sep:"\\\n  > " s
 }
 
 let eol = '\n' | eof
 let ws = ' ' | '\t'
+let cmd = [^'\n' '\\']+ ("\\\n  > " [^'\n' '\\']+)*
 
 rule file = parse
  | eof { [] }
@@ -24,6 +27,6 @@ rule file = parse
  | "%%" ([^'\n']* as str) eol              { err lexbuf "invalid pre-condition: %s" str }
  | "### " ([^'\n']* as str) eol { `Part str    :: file lexbuf }
  | "  " ws* "..." ws* eol       { `Ellipsis    :: file lexbuf }
- | "  $ " ([^'\n']* as str) eol { `Command str :: file lexbuf }
+ | "  $ " (cmd as str) eol      { `Command (commands str) :: file lexbuf }
  | "  " ([^'\n']* as str) eol   { `Output  str :: file lexbuf }
  | ([^'\n']* as str) eol        { `Comment str :: file lexbuf }

@@ -1,6 +1,6 @@
 type line = [
   | `Output  of string
-  | `Command of string
+  | `Command of string list
   | `Comment of string
   | `Part    of string
   | `Ellipsis

@@ -11,6 +11,13 @@ supports the following syntax:
 
 - Lines beginning with two spaces, a dollar sign, and a space are
   *commands* and will be run in the shell.
+- Multi-lines commands ends by `\` and continue with two spaces and
+  a `>` sign:
+  ```
+  $ <line1> \
+  > <line2> \
+  > <line3>
+  ```
 - Lines beginning with two spaces are considered command *output*.
 - Command outputs can contains *ellipsis*: `...`. These will
   match any possible outputs (on zero, one or multiple lines).
