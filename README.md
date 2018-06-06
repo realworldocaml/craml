@@ -11,8 +11,8 @@ supports the following syntax:
 
 - Lines beginning with two spaces, a dollar sign, and a space are
   *commands* and will be run in the shell.
-- Multi-lines commands ends by `\` and continue with two spaces and
-  a `>` sign:
+- Multi-lines commands end by `\` and continue with two spaces and
+  a `>` sign on the next line:
   ```
   $ <line1> \
   > <line2> \
