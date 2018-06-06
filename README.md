@@ -19,7 +19,9 @@ supports the following syntax:
   non-deterministic modes are supported as pre-conditions (see below).
 - Lines starting by `@@` are command *post-conditions*. Currently,
   only exit codes are supported as post-conditions (see below).
-- Anything else is a comment.
+- Anything else is a comment. It is not possible to put comments
+  in the middle of an output as it is not clear what should be done
+  to them when the output changes.
 
 To run the tests described in a `<file>`, use `cram <file>`. This will
 run all the commands in sequence and will generated `<file>.corrected`

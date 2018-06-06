@@ -18,7 +18,6 @@ type t = item list
 
 let fold l =
   let rec output ls acc k = function
-    | `Comment _ as l :: t -> output (l::ls) acc k t
     | `Ellipsis as l  :: t -> output (l:: t) (`Ellipsis :: acc) k t
     | `Output s as l  :: t -> output (l::ls) (`Output s :: acc) k t
     | l                    -> k (List.rev ls) (List.rev acc) l
