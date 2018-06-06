@@ -9,7 +9,7 @@ build: [ "jbuilder" "build" ]
 
 depends: [
   "jbuilder" {build}
-  "fmt"
+  "fmt" "astring"
 ]
 
 available: [
