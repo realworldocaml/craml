@@ -71,8 +71,7 @@ let part n t =
 
 let is_meta s = String.length s >= 2 && String.sub s 0 2 = "@@"
 
-let pp_command ppf c =
-  Fmt.pf ppf "  $ %a" Fmt.(list ~sep:(unit "\\\n  > ") string) c
+let pp_command = Fmt.(list ~sep:(unit "\\\n  > ") string)
 
 let pp_line ?(hide=false) ppf line =
   let pp_meta ppf fmt =
