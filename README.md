@@ -40,7 +40,7 @@ Ocaml-cram supports non-deterministic outputs:
 
 ```
   $ <command>
-<-- --non-deterministic
+<-- non-deterministic
   <output>
 ```
 
@@ -55,7 +55,7 @@ Ocaml-cram supports non-deterministic outputs:
 
 ```
   $ <command>
-<-- --non-deterministic [skip]
+<-- non-deterministic [skip]
   <output>
 ```
 
