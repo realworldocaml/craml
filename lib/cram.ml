@@ -27,7 +27,7 @@ let dump_nd ppf = function
   | `Output  -> Fmt.string ppf "`Output"
   | `False   -> Fmt.string ppf "`False"
 
-let dump_line ppf = function
+let dump_line ppf (l:line) = match l with
   | `Output s         -> Fmt.pf ppf "`Output %S\n" s
   | `Part s           -> Fmt.pf ppf "`Part %S\n" s
   | `Command c        -> Fmt.pf ppf "`Command %a" Fmt.(Dump.list dump_string) c
@@ -37,6 +37,8 @@ let dump_line ppf = function
   | `Comment s        -> Fmt.pf ppf "`Comment %S" s
   | `Exit i           -> Fmt.pf ppf "`Exit %d" i
 
+let dump_lines = Fmt.Dump.list dump_line
+
 let dump_test ppf t =
   Fmt.pf ppf
     "{@[part: %a;@ non_deterministic: %a;@ command: %a;@ output: %a;@ \
@@ -44,8 +46,8 @@ let dump_test ppf t =
     Fmt.(Dump.option string) t.part
     dump_nd t.non_deterministic
     Fmt.(Dump.list string) t.command
-    Fmt.(Dump.list dump_line) t.output
-    Fmt.(Dump.list dump_line) t.lines
+    dump_lines (t.output :> line list)
+    dump_lines t.lines
     t.exit_code
 
 let dump_item ppf = function
@@ -78,6 +80,7 @@ let fold (l:S.line list) =
           ) rest
       ) t
   in
+  Log.debug (fun m -> m "lines: @[%a@]" dump_lines l);
   command [] None (fun x -> x) l
 
 let parse_lexbuf l = Lexer.file l |> fold
