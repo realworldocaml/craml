@@ -1,5 +1,6 @@
 opam-version: "1.2"
 maintainer: "Thomas Gazagnaire <thomas@gazagnaire.org>"
+authors: ["Thomas Gazagnaire <thomas@gazagnaire.org"]
 homepage: "https://github.com/realworldocaml/ocaml-cram"
 license: "ISC"
 dev-repo: "https://github.com/realworldocaml/ocaml-cram.git"
