@@ -5,4 +5,5 @@ type line = [
   | `Part    of string
   | `Ellipsis
   | `Non_det of [`Command|`Output]
+  | `Exit    of int
 ]

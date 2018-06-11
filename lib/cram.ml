@@ -1,3 +1,6 @@
+let src = Logs.Src.create "cram"
+module Log = (val Logs.src_log src : Logs.LOG)
+
 type line = S.line
 
 type nd = [`Command | `Output | `False]
@@ -8,6 +11,7 @@ type test = {
   command: string list;
   output: [`Output of string | `Ellipsis] list;
   lines: line list;
+  exit_code: int;
 }
 
 type item =
@@ -18,6 +22,11 @@ type t = item list
 
 let dump_string ppf s = Fmt.pf ppf "%S" s
 
+let dump_nd ppf = function
+  | `Command -> Fmt.string ppf "`Command"
+  | `Output  -> Fmt.string ppf "`Output"
+  | `False   -> Fmt.string ppf "`False"
+
 let dump_line ppf = function
   | `Output s         -> Fmt.pf ppf "`Output %S\n" s
   | `Part s           -> Fmt.pf ppf "`Part %S\n" s
@@ -26,12 +35,31 @@ let dump_line ppf = function
   | `Non_det `Output  -> Fmt.pf ppf "`Non_det `Output"
   | `Non_det `Command -> Fmt.pf ppf "`Not_det `Command"
   | `Comment s        -> Fmt.pf ppf "`Comment %S" s
+  | `Exit i           -> Fmt.pf ppf "`Exit %d" i
 
-let fold l =
+let dump_test ppf t =
+  Fmt.pf ppf
+    "{@[part: %a;@ non_deterministic: %a;@ command: %a;@ output: %a;@ \
+     lines: %a;@ exit_code: %d@}]"
+    Fmt.(Dump.option string) t.part
+    dump_nd t.non_deterministic
+    Fmt.(Dump.list string) t.command
+    Fmt.(Dump.list dump_line) t.output
+    Fmt.(Dump.list dump_line) t.lines
+    t.exit_code
+
+let dump_item ppf = function
+  | Test t -> Fmt.pf ppf "Test %a" dump_test t
+  | Line l -> Fmt.pf ppf "Line @[%a@]" dump_line l
+
+let dump_items = Fmt.Dump.list dump_item
+
+let fold (l:S.line list) =
   let rec output ls acc k = function
     | `Ellipsis as l  :: t -> output (l:: t) (`Ellipsis :: acc) k t
     | `Output s as l  :: t -> output (l::ls) (`Output s :: acc) k t
-    | l                    -> k (List.rev ls) (List.rev acc) l
+    | `Exit i         :: l -> k i (List.rev ls) (List.rev acc) l
+    | l                    -> k 0 (List.rev ls) (List.rev acc) l
   and command lines part k = function
     | []                   -> k (List.map (fun l -> Line l) lines)
     | `Comment _ as l :: t -> command lines part (fun ls -> k (Line l :: ls)) t
@@ -39,11 +67,12 @@ let fold l =
     | `Command s as l :: t -> create (l :: lines) `False part s k t
     | (`Non_det nd as d) :: (`Command s as l) :: t ->
       create (l :: d :: lines) (nd :> nd) part s k t
-    | (`Non_det _ | `Output _ | `Ellipsis as l) :: _ ->
+    | (`Non_det _ | `Output _ | `Ellipsis | `Exit _ as l) :: _ ->
       Fmt.failwith "malformed input: '%a'" dump_line l
   and create ls non_deterministic part s k t =
-    output ls [] (fun lines output rest ->
-        let c = { lines; part; non_deterministic; command = s; output } in
+    output ls [] (fun exit_code lines output rest ->
+        let c = { exit_code; lines; part; non_deterministic;
+                  command = s; output } in
         command [] part (fun rest ->
             k (Test c :: rest)
           ) rest
@@ -56,7 +85,9 @@ let parse_file f = Lexer.file (snd (Common.init f)) |> fold
 
 let run n ~f =
   Common.run_expect_test n ~f:(fun c l ->
-      f c (parse_lexbuf l)
+      let items = parse_lexbuf l in
+      Log.debug (fun l -> l "run @[%a@]" dump_items items);
+      f c items
     )
 
 let part n t =
@@ -69,14 +100,12 @@ let part n t =
   | [] -> None
   | l  -> Some l
 
-let is_meta s = String.length s >= 2 && String.sub s 0 2 = "@@"
-
 let pp_command = Fmt.(list ~sep:(unit "\\\n  > ") string)
 
 let pp_line ?(hide=false) ppf line =
   let pp_meta ppf fmt =
     Fmt.kstrf (fun str ->
-        if not (hide && is_meta str) then Fmt.string ppf str
+        if not hide then Fmt.string ppf str
       ) fmt
   in
   match line with
@@ -87,6 +116,7 @@ let pp_line ?(hide=false) ppf line =
   | `Non_det `Output  -> pp_meta ppf "%%%% --non-deterministic\n"
   | `Non_det `Command -> pp_meta ppf "%%%% --non-deterministic [skip]\n"
   | `Comment s        -> pp_meta ppf "%s\n" s
+  | `Exit i           -> pp_meta ppf "@@@@ exit %d" i
 
 let pp ?hide ppf t =
   List.iter (function
@@ -97,7 +127,8 @@ let pp ?hide ppf t =
 let to_string ?hide t =
   Fmt.to_to_string (pp ?hide) t
 
-let pp_exit_code ppf n = if n <> 0 then Fmt.pf ppf "%s exit %d\n" "@@" n
+let pp_exit_code ppf n =
+  if n <> 0 then Fmt.pf ppf "%a\n" (pp_line ~hide:false) (`Exit n)
 
 type output = [`Output of string | `Ellipsis]
 
@@ -116,12 +147,13 @@ module Html = struct
 
   let pp_command ppf c = Fmt.(list ~sep:(unit "\\\n  ") string) ppf c
 
-  let pp_line ppf line =
+  let pp_line ppf (line:S.line) =
     match line with
     | `Output s  -> Fmt.pf ppf ">%s\n" s
     | `Part _    -> assert false
     | `Command c -> Fmt.pf ppf "%a\n" pp_command c
     | `Ellipsis  -> Fmt.pf ppf "  ...\n"
+    | `Exit i    -> Fmt.pf ppf "[exit %d]" i
     | `Non_det _
     | `Comment _ -> ()
 
