@@ -1,3 +1,6 @@
+let src = Logs.Src.create "cram"
+module Log = (val Logs.src_log src : Logs.LOG)
+
 type line = S.line
 
 type nd = [`Command | `Output | `False]
@@ -18,6 +21,11 @@ type t = item list
 
 let dump_string ppf s = Fmt.pf ppf "%S" s
 
+let dump_nd ppf = function
+  | `Command -> Fmt.string ppf "`Command"
+  | `Output  -> Fmt.string ppf "`Output"
+  | `False   -> Fmt.string ppf "`False"
+
 let dump_line ppf = function
   | `Output s         -> Fmt.pf ppf "`Output %S\n" s
   | `Part s           -> Fmt.pf ppf "`Part %S\n" s
@@ -26,6 +34,22 @@ let dump_line ppf = function
   | `Non_det `Output  -> Fmt.pf ppf "`Non_det `Output"
   | `Non_det `Command -> Fmt.pf ppf "`Not_det `Command"
   | `Comment s        -> Fmt.pf ppf "`Comment %S" s
+
+let dump_test ppf t =
+  Fmt.pf ppf
+    "{@[part: %a;@ non_deterministic: %a;@ command: %a;@ output: %a;@ \
+     lines: %a@}]"
+    Fmt.(Dump.option string) t.part
+    dump_nd t.non_deterministic
+    Fmt.(Dump.list string) t.command
+    Fmt.(Dump.list dump_line) t.output
+    Fmt.(Dump.list dump_line) t.lines
+
+let dump_item ppf = function
+  | Test t -> Fmt.pf ppf "Test %a" dump_test t
+  | Line l -> Fmt.pf ppf "Line @[%a@]" dump_line l
+
+let dump_items = Fmt.Dump.list dump_item
 
 let fold l =
   let rec output ls acc k = function
@@ -56,7 +80,9 @@ let parse_file f = Lexer.file (snd (Common.init f)) |> fold
 
 let run n ~f =
   Common.run_expect_test n ~f:(fun c l ->
-      f c (parse_lexbuf l)
+      let items = parse_lexbuf l in
+      Log.debug (fun l -> l "run @[%a@]" dump_items items);
+      f c items
     )
 
 let part n t =

@@ -38,7 +38,7 @@ let run_test temp_file t =
   | WEXITED n -> n
   | _ -> 255
 
-let run non_deterministic expect_test =
+let run () non_deterministic expect_test =
   Cram.run expect_test ~f:(fun file_contents items ->
       let temp_file = Filename.temp_file "cram" ".output" in
       at_exit (fun () -> Sys.remove temp_file);
@@ -79,6 +79,15 @@ let non_deterministic =
   let doc = "Run non-deterministic tests." in
   Arg.(value & flag & info ["non-deterministic"; "n"] ~doc)
 
+let setup_log style_renderer level =
+  Fmt_tty.setup_std_outputs ?style_renderer ();
+  Logs.set_level level;
+  Logs.set_reporter (Logs_fmt.reporter ());
+  ()
+
+let setup_log =
+  Term.(const setup_log $ Fmt_cli.style_renderer () $ Logs_cli.level ())
+
 let expect_test =
   let doc = "The test to run." in
   Arg.(required & pos 0 (some string) None & info [] ~doc ~docv:"FILE")
@@ -86,7 +95,7 @@ let expect_test =
 let cmd =
   let doc = "A simple tool for to run CRAM tests." in
   let exits = Term.default_exits in
-  Term.(pure run $ non_deterministic $ expect_test),
+  Term.(pure run $ setup_log $ non_deterministic $ expect_test),
   Term.info "cram" ~version:"%%VERSION%%" ~doc ~exits
 
 let () = Term.(exit @@ eval cmd)
