@@ -1,0 +1,14 @@
+(alias
+ ((name runtest)
+  (deps (comments.sh))
+  (action (progn (run ${exe:../bin/main.exe} ${<}) (diff? ${<} ${<}.corrected)))))
+
+(alias
+ ((name runtest)
+  (deps (lines.sh))
+  (action (progn (run ${exe:../bin/main.exe} ${<}) (diff? ${<} ${<}.corrected)))))
+
+(alias
+ ((name runtest)
+  (deps (exit.sh))
+  (action (progn (run ${exe:../bin/main.exe} ${<}) (diff? ${<} ${<}.corrected)))))
