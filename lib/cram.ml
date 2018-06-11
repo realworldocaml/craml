@@ -113,10 +113,10 @@ let pp_line ?(hide=false) ppf line =
   | `Part s           -> Fmt.pf ppf "### %s\n" s
   | `Command c        -> Fmt.pf ppf "  $ %a\n" pp_command c
   | `Ellipsis         -> Fmt.pf ppf "  ...\n"
-  | `Non_det `Output  -> pp_meta ppf "%%%% --non-deterministic\n"
-  | `Non_det `Command -> pp_meta ppf "%%%% --non-deterministic [skip]\n"
+  | `Non_det `Output  -> pp_meta ppf "<-- --non-deterministic\n"
+  | `Non_det `Command -> pp_meta ppf "<-- --non-deterministic [skip]\n"
   | `Comment s        -> pp_meta ppf "%s\n" s
-  | `Exit i           -> pp_meta ppf "@@@@ exit %d" i
+  | `Exit i           -> pp_meta ppf "--> exit %d" i
 
 let pp ?hide ppf t =
   List.iter (function
