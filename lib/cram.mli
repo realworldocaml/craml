@@ -11,6 +11,7 @@ type line = [
   | `Comment of string
   | `Part    of string
   | `Non_det of [`Output | `Command]
+  | `Exit    of int
 ]
 
 val pp_command: string list Fmt.t
@@ -28,6 +29,7 @@ type test = {
   command: string list;
   output: output list;
   lines: line list;
+  exit_code: int;
 }
 
 (** The type for test items *)
