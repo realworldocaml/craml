@@ -18,3 +18,10 @@
   (action (progn
            (run ${exe:../bin/main.exe} ${<})
            (diff? ${<}.expected ${<}.corrected)))))
+
+(alias
+ ((name runtest)
+  (deps (nd.sh))
+  (action (progn
+           (run ${exe:../bin/main.exe} ${<})
+           (diff? ${<} ${<}.corrected)))))
