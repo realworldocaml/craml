@@ -14,7 +14,10 @@ build-test: ["jbuilder" "runtest" "-p" name]
 
 depends: [
   "jbuilder" {build}
-  "fmt" "astring"
+  "fmt"
+  "astring"
+  "logs"
+  "cmdliner"
 ]
 
 available: [
