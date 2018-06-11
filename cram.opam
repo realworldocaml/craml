@@ -5,7 +5,11 @@ license: "ISC"
 dev-repo: "https://github.com/realworldocaml/ocaml-cram.git"
 bug-reports: "https://github.com/realworldocaml/ocaml-cram/issues"
 
-build: [ "jbuilder" "build" ]
+build: [
+ ["jbuilder" "subst"] {pinned}
+ ["jbuilder" "build" "-p" name "-j" jobs]
+]
+build-test: ["jbuilder" "runtest" "-p" name]
 
 depends: [
   "jbuilder" {build}
