@@ -23,10 +23,11 @@ let digit = ['0' - '9']
 
 rule file = parse
  | eof { [] }
- | "%% --non-deterministic" ws* eol        { `Non_det `Output  :: file lexbuf }
- | "%% --non-deterministic [skip]" ws* eol { `Non_det `Command :: file lexbuf }
- | "%%" ([^'\n']* as str) eol { err lexbuf "invalid pre-condition: %s" str }
- | "@@ exit" ws+ (digit + as str) eol { `Exit (int_of_string str) :: file lexbuf }
+ | "<-- non-deterministic" ws* eol        { `Non_det `Output  :: file lexbuf }
+ | "<-- non-deterministic [skip]" ws* eol { `Non_det `Command :: file lexbuf }
+ | "<--" ([^'\n']* as str) eol { err lexbuf "invalid pre-condition: %s" str }
+ | "--> exit" ws+ (digit + as str) eol { `Exit (int_of_string str) :: file lexbuf }
+ | "-->"  ([^'\n']* as str) eol { err lexbuf "invalid post-condition: %s" str }
  | "### " ([^'\n']* as str) eol { `Part str    :: file lexbuf }
  | "  " ws* "..." ws* eol       { `Ellipsis    :: file lexbuf }
  | "  $ " (cmd as str) eol      { `Command (commands str) :: file lexbuf }

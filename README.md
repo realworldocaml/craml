@@ -21,10 +21,10 @@ supports the following syntax:
 - Lines beginning with two spaces are considered command *output*.
 - Command outputs can contains *ellipsis*: `...`. These will
   match any possible outputs (on zero, one or multiple lines).
-- Lines starting by `%%` are command *pre-conditions*; they will
+- Lines starting by `<--` are command *pre-conditions*; they will
   determine the conditions where the command is run. Currently, only
   non-deterministic modes are supported as pre-conditions (see below).
-- Lines starting by `@@` are command *post-conditions*. Currently,
+- Lines starting by `-->` are command *post-conditions*. Currently,
   only exit codes are supported as post-conditions (see below).
 - Anything else is a comment. It is not possible to put comments
   in the middle of an output as it is not clear what should be done
@@ -40,7 +40,7 @@ Ocaml-cram supports non-deterministic outputs:
 
 ```
   $ <command>
-%% --non-deterministic
+<-- non-deterministic
   <output>
 ```
 
@@ -55,7 +55,7 @@ Ocaml-cram supports non-deterministic outputs:
 
 ```
   $ <command>
-%% --non-deterministic [skip]
+<-- non-deterministic [skip]
   <output>
 ```
 
@@ -69,7 +69,7 @@ Ocaml-cram tests exit codes:
 ```
   $ <command>
   <output>
-@@ exit 10
+--> exit 10
 ```
 
 If `<command>` does not exit with code 10, then `cram <file>` will

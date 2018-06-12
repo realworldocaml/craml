@@ -1,6 +1,6 @@
 (alias
  ((name runtest)
-  (deps (comments.sh))
+  (deps (comments.sh comments.sh.expected))
   (action (progn
            (run ${exe:../bin/main.exe} ${<})
            (diff? ${<}.expected ${<}.corrected)))))
@@ -14,7 +14,14 @@
 
 (alias
  ((name runtest)
-  (deps (exit.sh))
+  (deps (exit.sh exit.sh.expected))
   (action (progn
            (run ${exe:../bin/main.exe} ${<})
            (diff? ${<}.expected ${<}.corrected)))))
+
+(alias
+ ((name runtest)
+  (deps (nd.sh))
+  (action (progn
+           (run ${exe:../bin/main.exe} ${<})
+           (diff? ${<} ${<}.corrected)))))
