@@ -39,8 +39,8 @@ if one of the output do not match the expected command outputs.
 Ocaml-cram supports non-deterministic outputs:
 
 ```
-  $ <command>
 <-- non-deterministic
+  $ <command>
   <output>
 ```
 
@@ -54,8 +54,8 @@ back to the default behaviour.
 Ocaml-cram supports non-deterministic outputs:
 
 ```
-  $ <command>
 <-- non-deterministic [skip]
+  $ <command>
   <output>
 ```
 
