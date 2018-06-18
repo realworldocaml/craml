@@ -1,3 +1,8 @@
+let src = Logs.Src.create "cram"
+module Log = (val Logs.src_log src : Logs.LOG)
+
+open Astring
+
 let read_lines file =
   let ic = open_in file in
   let r = ref [] in
@@ -27,12 +32,22 @@ let ansi_color_strip str =
   in
   loop 0
 
+
+(* http://tldp.org/LDP/abs/html/here-docs.html *)
+let use_heredoc t =
+  String.cut (List.hd t.Cram.command) ~sep:"<<" <> None
+
+let command_of_test t =
+  if not (use_heredoc t) then
+    String.concat ~sep:" " t.Cram.command
+  else
+    String.concat ~sep:"\n" t.Cram.command
+
 let run_test temp_file t =
+  let cmd = command_of_test t in
+  Log.info (fun l -> l "exec: %S" cmd);
   let fd = Unix.openfile temp_file [O_WRONLY; O_TRUNC] 0 in
-  let pid =
-    Unix.create_process
-      "sh" [|"sh"; "-c"; String.concat " " t.Cram.command|] Unix.stdin fd fd
-  in
+  let pid = Unix.create_process "sh" [| "sh"; "-c"; cmd |] Unix.stdin fd fd in
   Unix.close fd;
   match snd (Unix.waitpid [] pid) with
   | WEXITED n -> n
