@@ -14,6 +14,13 @@
 
 (alias
  ((name runtest)
+  (deps (here.t))
+  (action (progn
+           (run ${exe:../bin/main.exe} ${<})
+           (diff? ${<} ${<}.corrected)))))
+
+(alias
+ ((name runtest)
   (deps (exit.t exit.t.expected))
   (action (progn
            (run ${exe:../bin/main.exe} ${<})

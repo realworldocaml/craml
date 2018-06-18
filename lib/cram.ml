@@ -28,8 +28,8 @@ let dump_nd ppf = function
   | `False   -> Fmt.string ppf "`False"
 
 let dump_line ppf (l:line) = match l with
-  | `Output s         -> Fmt.pf ppf "`Output %S\n" s
-  | `Part s           -> Fmt.pf ppf "`Part %S\n" s
+  | `Output s         -> Fmt.pf ppf "`Output %S" s
+  | `Part s           -> Fmt.pf ppf "`Part %S" s
   | `Command c        -> Fmt.pf ppf "`Command %a" Fmt.(Dump.list dump_string) c
   | `Ellipsis         -> Fmt.pf ppf "`Ellipsis"
   | `Non_det `Output  -> Fmt.pf ppf "`Non_det `Output"
@@ -42,10 +42,10 @@ let dump_lines = Fmt.Dump.list dump_line
 let dump_test ppf t =
   Fmt.pf ppf
     "{@[part: %a;@ non_deterministic: %a;@ command: %a;@ output: %a;@ \
-     lines: %a;@ exit_code: %d@}]"
+     lines: %a;@ exit_code: %d@]}"
     Fmt.(Dump.option string) t.part
     dump_nd t.non_deterministic
-    Fmt.(Dump.list string) t.command
+    Fmt.(Dump.list dump_string) t.command
     dump_lines (t.output :> line list)
     dump_lines t.lines
     t.exit_code
