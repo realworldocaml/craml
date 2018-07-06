@@ -1,12 +1,12 @@
-## ocaml-cram: CRAM testing framework
+## craml: A CRAM-testing framework for testing shell scripts
 
 CRAM is a is functional testing framework for command line
-applications. `ocaml-cram` is freely inspired by the [Python
+applications. `craml` is freely inspired by the [Python
 tool](https://bitheap.org/cram/), which was itself based on
 Mercurial's [unified test
 format](https://www.selenic.com/blog/?p=663).
 
-Ocaml-cram is released as a single binary (called `cram`) and
+`craml` is released as a single binary (called `craml`) and
 supports the following syntax:
 
 - Lines beginning with two spaces, a dollar sign, and a space are
@@ -30,13 +30,13 @@ supports the following syntax:
   in the middle of an output as it is not clear what should be done
   to them when the output changes.
 
-To run the tests described in a `<file>`, use `cram <file>`. This will
+To run the tests described in a `<file>`, use `craml <file>`. This will
 run all the commands in sequence and will generated `<file>.corrected`
 if one of the output do not match the expected command outputs.
 
 ### Non-deterministic Outputs
 
-Ocaml-cram supports non-deterministic outputs:
+`craml` supports non-deterministic outputs:
 
 ```
 <-- non-deterministic
@@ -44,14 +44,14 @@ Ocaml-cram supports non-deterministic outputs:
   <output>
 ```
 
-In that case, `cram <file>` will run the command but will not
+In that case, `craml <file>` will run the command but will not
 generate `<file>.corrected` if the new output differs from the one
-described in the file. Use `cram --non-deterministic <file>` to come
+described in the file. Use `craml --non-deterministic <file>` to come
 back to the default behaviour.
 
 ### Non-deterministic Commands
 
-Ocaml-cram supports non-deterministic outputs:
+`craml` supports non-deterministic outputs:
 
 ```
 <-- non-deterministic [skip]
@@ -59,12 +59,12 @@ Ocaml-cram supports non-deterministic outputs:
   <output>
 ```
 
-In that case, `cram <file>` will *not* run the command. Use `cram
+In that case, `craml <file>` will *not* run the command. Use `craml
 --non-deterministic <file>` to come back to the default behaviour.
 
 ### Exit Codes
 
-Ocaml-cram tests exit codes:
+`craml` tests exit codes:
 
 ```
   $ <command>
@@ -72,6 +72,6 @@ Ocaml-cram tests exit codes:
 --> exit 10
 ```
 
-If `<command>` does not exit with code 10, then `cram <file>` will
+If `<command>` does not exit with code 10, then `craml <file>` will
 generate `<file>.corrected` with the right exit code. Note that `@@
 exit 0` will not be displayed.
