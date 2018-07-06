@@ -1,13 +1,13 @@
 opam-version: "1.2"
 maintainer: "Thomas Gazagnaire <thomas@gazagnaire.org>"
 authors: ["Thomas Gazagnaire <thomas@gazagnaire.org"]
-homepage: "https://github.com/realworldocaml/ocaml-cram"
+homepage: "https://github.com/realworldocaml/craml"
 license: "ISC"
-dev-repo: "https://github.com/realworldocaml/ocaml-cram.git"
-bug-reports: "https://github.com/realworldocaml/ocaml-cram/issues"
+dev-repo: "https://github.com/realworldocaml/craml.git"
+bug-reports: "https://github.com/realworldocaml/craml/issues"
 
 build: [
- ["jbuilder" "subst"] {pinned}
+ ["jbuilder" "subst" "-p" name] {pinned}
  ["jbuilder" "build" "-p" name "-j" jobs]
 ]
 build-test: ["jbuilder" "runtest" "-p" name]
