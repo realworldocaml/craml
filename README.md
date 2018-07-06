@@ -1,4 +1,4 @@
-## craml: A CRAM-testing framework for testing shell scripts
+## craml: a tool for testing command-line applications
 
 CRAM is a is functional testing framework for command line
 applications. `craml` is freely inspired by the [Python
