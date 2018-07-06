@@ -5,5 +5,3 @@
   (public_name cram)
   (modules     (main))
   (libraries   (fmt cram unix cmdliner logs.cli logs.fmt fmt.cli fmt.tty))))
-
-(executable ((name convert) (modules convert)))
