@@ -35,13 +35,13 @@ let ansi_color_strip str =
 
 (* http://tldp.org/LDP/abs/html/here-docs.html *)
 let use_heredoc t =
-  String.cut (List.hd t.Cram.command) ~sep:"<<" <> None
+  String.cut (List.hd t.Craml.command) ~sep:"<<" <> None
 
 let command_of_test t =
   if not (use_heredoc t) then
-    String.concat ~sep:" " t.Cram.command
+    String.concat ~sep:" " t.Craml.command
   else
-    String.concat ~sep:"\n" t.Cram.command
+    String.concat ~sep:"\n" t.Craml.command
 
 let run_test temp_file t =
   let cmd = command_of_test t in
@@ -54,36 +54,36 @@ let run_test temp_file t =
   | _ -> 255
 
 let run () non_deterministic expect_test =
-  Cram.run expect_test ~f:(fun file_contents items ->
+  Craml.run expect_test ~f:(fun file_contents items ->
       let temp_file = Filename.temp_file "cram" ".output" in
       at_exit (fun () -> Sys.remove temp_file);
       let buf = Buffer.create (String.length file_contents + 1024) in
       let ppf = Format.formatter_of_buffer buf in
       List.iter (function
-          | Cram.Line l -> Cram.pp_line ppf l
-          | Cram.Test t ->
-            match non_deterministic, t.Cram.non_deterministic with
+          | Craml.Line l -> Craml.pp_line ppf l
+          | Craml.Test t ->
+            match non_deterministic, t.Craml.non_deterministic with
             | false, `Command ->
               (* the command is non-deterministic so skip everything *)
-              List.iter (Cram.pp_line ppf) t.Cram.lines
+              List.iter (Craml.pp_line ppf) t.Craml.lines
             | false, `Output ->
               (* the command's output is non-deterministic; run it but
                  keep the old output. *)
               let _ = run_test temp_file t in
-              List.iter (Cram.pp_line ppf) t.Cram.lines
+              List.iter (Craml.pp_line ppf) t.Craml.lines
             | _ ->
               let n = run_test temp_file t in
               let lines = read_lines temp_file in
               let output =
                 let output = List.map (fun x -> `Output x) lines in
-                if Cram.equal_output output t.output then t.output else output
+                if Craml.equal_output output t.output then t.output else output
               in
-              Fmt.pf ppf "  $ %a\n" Cram.pp_command t.Cram.command;
+              Fmt.pf ppf "  $ %a\n" Craml.pp_command t.Craml.command;
               List.iter (function
                   | `Ellipsis    -> Fmt.pf ppf "  ...\n"
                   | `Output line -> Fmt.pf ppf "  %s\n" (ansi_color_strip line)
                 ) output;
-              Cram.pp_exit_code ppf n
+              Craml.pp_exit_code ppf n
         ) items;
       Format.pp_print_flush ppf ();
       Buffer.contents buf)

@@ -2,8 +2,6 @@
 
 (executable
  ((name        main)
-  (public_name cram)
+  (public_name craml)
   (modules     (main))
-  (libraries   (fmt cram unix cmdliner logs.cli logs.fmt fmt.cli fmt.tty))))
-
-(executable ((name convert) (modules convert)))
+  (libraries   (fmt craml unix cmdliner logs.cli logs.fmt fmt.cli fmt.tty))))

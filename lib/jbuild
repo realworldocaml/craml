@@ -1,8 +1,8 @@
 (jbuild_version 1)
 
 (library
- ((name        cram)
-  (public_name cram)
+ ((name        craml)
+  (public_name craml)
   (libraries  (fmt astring logs))))
 
 (ocamllex (lexer))
