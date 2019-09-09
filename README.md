@@ -1,6 +1,6 @@
 ## craml: a tool for testing command-line applications
 
-**DEPRECATED: use [mdx](https://github.com/realworldocaml/mdx) instead
+**DEPRECATED: use [mdx](https://github.com/realworldocaml/mdx) instead**
 
 CRAM is a is functional testing framework for command line
 applications. `craml` is freely inspired by the [Python
